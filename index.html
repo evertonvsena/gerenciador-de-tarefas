@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <style>
+    .completed .v-label {
+      color: #d9d9d9;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+
+      <v-app-bar color="teal" dark>
+        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+        <v-toolbar-title>Tarefas</v-toolbar-title>
+      </v-app-bar>
+
+      <v-content style="height: 100%;">
+        <v-container>
+
+          <v-row justify="center">
+            <v-col cols="6">
+
+              <v-text-field rounded solo placeholder="Adicionar Tarefa" @keyup.enter="salvar($event)"></v-text-field>
+
+              <v-card>
+                <v-card-title>
+                  Lista de Tarefas
+                </v-card-title>
+                <v-card-text>
+                  <div v-for="tarefa in lista_tarefas" :key="tarefa.id">
+                    <v-checkbox color="teal" :class="{'completed': tarefa.completada}" v-model="tarefa.completada" :label="tarefa.texto" single-line hide-details>
+
+                      <template v-slot:append>
+                        <v-btn icon color="black" @click="remover(tarefa)">
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                      </template>
+
+                    </v-checkbox>
+                  </div>
+                </v-card-text>
+                
+                <v-divider></v-divider>
+
+                <v-card-actions class="d-flex justify-center">
+                  <v-btn-toggle v-model="filtro">
+                    <v-btn small value="todas">Todas</v-btn>
+                    <v-btn small value="ativas">Ativas</v-btn>
+                    <v-btn small value="completadas">Completadas</v-btn>
+                  </v-btn-toggle>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+
+      data: () => {
+        return {
+          tarefas: [
+            { id: 1, texto: 'Tarefa 1', completada: false },
+            { id: 2, texto: 'Tarefa 2', completada: false },
+            { id: 3, texto: 'Tarefa 3', completada: true },
+            { id: 4, texto: 'Tarefa 4', completada: false },
+            { id: 5, texto: 'Tarefa 5', completada: false },
+          ],
+
+          filtro: 'todas'
+        }
+      },
+
+      methods: {
+        salvar(event) {
+          let new_id = this.tarefas.length;
+          this.tarefas.push({
+            id: new_id++,
+            texto: event.target.value,
+            completada: false
+          })
+
+          event.target.value = '';
+        },
+
+        remover(tarefa) {
+          this.tarefas.splice(this.tarefas.indexOf(tarefa), 1);
+        }
+      },
+
+      computed: {
+        lista_tarefas() {
+          if (this.filtro == 'todas') {
+            return this.tarefas;
+          }
+
+          if (this.filtro == 'ativas') {
+            return this.tarefas.filter(tarefa => !tarefa.completada);
+          }
+
+          if (this.filtro == 'completadas') {
+            return this.tarefas.filter(tarefa => tarefa.completada);
+          }
+        }
+      },
+    })
+  </script>
+</body>
+</html>
